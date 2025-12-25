@@ -2,8 +2,10 @@
   "name": "session-memory-optimizer",
   "version": "1.0.0",
   "description": "Optimize Claude Code session performance with health monitoring, context pruning guidance, and checkpoints for long coding sessions.",
-  "author": "aimakemoney",
-  "homepage": "https://github.com/aimakemoney/session-memory-optimizer",
+  "author": {
+    "name": "aimakemoney"
+  },
+  "homepage": "https://github.com/ojallington/session-memory-optimizer",
   "keywords": [
     "session",
     "memory",
