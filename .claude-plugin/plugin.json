@@ -1,18 +1,31 @@
 {
   "name": "session-memory-optimizer",
+  "display_name": "Session Memory Optimizer",
   "version": "1.0.0",
   "description": "Optimize Claude Code session performance with health monitoring, context pruning guidance, and checkpoints for long coding sessions.",
+  "summary": "Real-time health monitoring and optimization for long Claude Code sessions",
   "author": {
-    "name": "aimakemoney"
+    "name": "ojallington",
+    "url": "https://github.com/ojallington"
   },
+  "repository": "https://github.com/ojallington/session-memory-optimizer",
   "homepage": "https://github.com/ojallington/session-memory-optimizer",
+  "documentation_url": "https://github.com/ojallington/session-memory-optimizer#readme",
   "keywords": [
     "session",
     "memory",
     "optimization",
     "performance",
     "context",
-    "checkpoint"
+    "checkpoint",
+    "health",
+    "metrics",
+    "analytics"
+  ],
+  "categories": [
+    "productivity",
+    "optimization",
+    "developer-tools"
   ],
   "license": "MIT"
 }
