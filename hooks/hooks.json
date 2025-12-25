@@ -1,0 +1,41 @@
+{
+  "description": "Session Memory Optimizer hooks for context management and optimization",
+  "hooks": {
+    "PreCompact": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "CONTEXT OPTIMIZATION GUIDANCE:\n\nWhen compacting this session, apply these priorities:\n\nPRESERVE (Critical):\n- Current active task and immediate goals\n- Recent decisions and their rationale\n- Active file contents being edited\n- Unresolved errors or blockers\n- User preferences established this session\n- Pending TODOs and action items\n\nPRESERVE (Summarized):\n- Overall project context (summarize, don't lose)\n- Key patterns/conventions established\n- Major milestones and their outcomes\n\nSAFE TO AGGRESSIVELY COMPRESS:\n- Old tool outputs (git status, ls, etc.) that are stale\n- File contents that were subsequently edited (use latest version)\n- Exploratory paths that were explicitly abandoned\n- Verbose error messages that have been resolved\n- Repeated similar exchanges (keep conclusions, drop iterations)\n- Background research no longer actively referenced\n\nCOMPACTION STRATEGY:\n1. Preserve intent and decisions over implementation details\n2. Keep 'why' reasoning, compress 'how' details\n3. Maintain continuity of active work\n4. Summarize completed work, detail pending work\n\nReturn compacted context that maintains productivity.",
+            "timeout": 30000
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/session-start-loader.sh 2>/dev/null || true",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/session-end-saver.sh 2>/dev/null || true",
+            "timeout": 10000
+          }
+        ]
+      }
+    ]
+  }
+}
