@@ -27,16 +27,11 @@ This plugin provides **real-time, automated** session management:
 
 ### From GitHub (Recommended)
 ```bash
-claude plugins add github:ojallington/session-memory-optimizer
-```
+# Step 1: Add the marketplace
+/plugin marketplace add ojallington/session-memory-optimizer
 
-### From Claude Code Marketplace
-```bash
-# Search for the plugin
-claude plugins search session-memory-optimizer
-
-# Install by name
-claude plugins add session-memory-optimizer
+# Step 2: Install the plugin
+/plugin install session-memory-optimizer@ojallington-session-memory-optimizer
 ```
 
 ### Local Development

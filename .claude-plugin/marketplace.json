@@ -1,0 +1,13 @@
+{
+  "name": "session-memory-optimizer-marketplace",
+  "description": "Session Memory Optimizer plugin for Claude Code",
+  "owner": {
+    "name": "ojallington"
+  },
+  "plugins": [
+    {
+      "name": "session-memory-optimizer",
+      "source": "."
+    }
+  ]
+}
