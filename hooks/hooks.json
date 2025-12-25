@@ -1,6 +1,18 @@
 {
   "description": "Session Memory Optimizer hooks for context management and optimization",
   "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Read|Write|Edit|Bash|Grep|Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/post-tool-tracker.sh 2>/dev/null || true",
+            "timeout": 3000
+          }
+        ]
+      }
+    ],
     "PreCompact": [
       {
         "matcher": "*",

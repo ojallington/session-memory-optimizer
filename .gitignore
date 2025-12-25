@@ -1,0 +1,17 @@
+# Runtime data (user-specific)
+data/metrics.json
+data/analytics.json
+data/.session_start
+data/checkpoints/*.json
+
+# Keep directory structure
+!data/.gitkeep
+!data/checkpoints/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db

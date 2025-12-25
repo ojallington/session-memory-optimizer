@@ -34,3 +34,6 @@ fi
 
 # Record session start time
 echo "$(date -Iseconds)" > "$PLUGIN_ROOT/data/.session_start"
+
+# Initialize metrics for new session
+python3 "$PLUGIN_ROOT/scripts/metrics-tracker.py" init 2>/dev/null || true

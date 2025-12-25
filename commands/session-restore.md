@@ -1,7 +1,7 @@
 ---
 name: session-restore
 description: Restore session context from a previously saved checkpoint
-argument-hint: <checkpoint-name>
+argument-hint: [checkpoint-name]
 allowed-tools: Read, Bash
 ---
 
@@ -9,70 +9,73 @@ allowed-tools: Read, Bash
 
 Load a previously saved checkpoint to restore session context.
 
-## Checkpoint Name
+## Process
 
-Restoring checkpoint: `$ARGUMENTS` (or "default" if not specified)
+### 1. List or Load Checkpoint
 
-## Steps
+**If no argument provided**, list available checkpoints:
 
-1. **List Available Checkpoints** (if no name provided)
-   Check `${CLAUDE_PLUGIN_ROOT}/data/checkpoints/` for available checkpoints.
-   Display: name, timestamp, summary preview for each.
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint-manager.py list
+```
 
-2. **Load Checkpoint File**
-   Read from: `${CLAUDE_PLUGIN_ROOT}/data/checkpoints/<name>.json`
+Then ask user: "Which checkpoint would you like to restore?"
 
-3. **Restore Context**
-   Parse the checkpoint and internalize:
+**If argument provided** (`$ARGUMENTS`), load the checkpoint:
 
-   **Immediate Context:**
-   - Current task/goal we were working on
-   - Active files that need attention
-   - Where we left off
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint-manager.py load "$ARGUMENTS"
+```
 
-   **Background Context:**
-   - Key decisions made (and why)
-   - Patterns/conventions established
-   - Approaches that were tried/rejected
+Or directly read: `${CLAUDE_PLUGIN_ROOT}/data/checkpoints/$ARGUMENTS.json`
 
-   **Action Items:**
-   - Pending TODOs to address
-   - Any blockers that need resolution
-   - Next steps to take
+### 2. Parse and Display
 
-4. **Display Restoration Summary**
-   ```
-   CHECKPOINT RESTORED
-   ===================
-   Name:      <checkpoint-name>
-   Saved:     <timestamp>
+Parse the checkpoint JSON and display:
 
-   Current Task: <what we were working on>
+```
+CHECKPOINT RESTORED
+===================
+Name:       <name>
+Saved:      <timestamp>
+Health:     <health_score>/100 at save time
 
-   Key Context:
-   - <decision 1>
-   - <decision 2>
+CONTEXT SUMMARY
+---------------
+<summary field>
 
-   Active Files:
-   - <file 1>
-   - <file 2>
+CURRENT TASK
+------------
+<current_task field>
 
-   Pending Items:
-   - <todo 1>
-   - <todo 2>
+KEY DECISIONS
+-------------
+- <decision 1>
+- <decision 2>
 
-   Ready to continue from where you left off.
-   ```
+ACTIVE FILES
+------------
+- <file 1>
+- <file 2>
+```
 
-5. **Offer to Read Active Files**
-   Suggest reading the active files to fully restore working context.
+### 3. Internalize Context
 
-## Usage Examples
+State your understanding:
+"Based on this checkpoint, I understand that:
+- We were working on: [current_task]
+- Key decisions made: [list decisions]
+- The context hints suggest: [context_hints]"
+
+### 4. Offer File Loading
+
+If the checkpoint contains `active_files`, offer:
+"Would you like me to read any of these active files to restore full context?"
+
+List the files for user selection.
+
+## Examples
 
 - `/session-restore` - List available checkpoints
-- `/session-restore before-refactor` - Restore specific checkpoint
-- `/session-restore end-of-day` - Resume previous day's work
-
-## Notes
-
-Restoration provides semantic context, not exact state. Use this after starting a fresh session to quickly get back up to speed.
+- `/session-restore milestone-1` - Restore specific checkpoint
+- `/session-restore before-refactor` - Resume from save point

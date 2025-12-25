@@ -7,63 +7,77 @@ allowed-tools: Write, Bash, Read
 
 # Create Session Checkpoint
 
-Save a summarized snapshot of the current session context that can be restored later.
+Save the current session context with auto-captured metrics and a summary.
 
 ## Checkpoint Name
 
-The checkpoint will be saved as: `$ARGUMENTS` (or "default" if not specified)
+Use: `$ARGUMENTS` (if not provided, ask user for a name)
 
-## Steps
+## Process
 
-1. **Summarize Current Context**
-   Capture the essential elements of this session:
+### 1. Get Current Metrics
 
-   **Active Work:**
-   - What files are being actively worked on?
-   - What is the current task/goal?
-   - What stage of completion are we at?
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/metrics-tracker.py export
+```
 
-   **Key Decisions:**
-   - What architectural/design decisions were made?
-   - What approaches were tried and rejected?
-   - What patterns/conventions were established?
+Parse the JSON to identify:
+- Files recently read/written (from `metrics.files_read`, `metrics.files_written`)
+- Session duration and health score
+- Tool usage patterns
 
-   **Important State:**
-   - Any unresolved errors or blockers?
-   - Pending TODOs or follow-up items?
-   - Critical context that must not be lost?
+### 2. Create Summary
 
-2. **Create Checkpoint File**
-   Save to: `${CLAUDE_PLUGIN_ROOT}/data/checkpoints/<name>.json`
+Based on metrics AND the current conversation context, create:
 
-   Format:
-   ```json
-   {
-     "name": "<checkpoint-name>",
-     "timestamp": "<ISO timestamp>",
-     "summary": "<2-3 paragraph summary of session state>",
-     "active_files": ["list", "of", "key", "files"],
-     "current_task": "<description of current goal>",
-     "decisions": ["key decision 1", "key decision 2"],
-     "patterns": ["established pattern 1", "pattern 2"],
-     "todos": ["pending item 1", "pending item 2"],
-     "blockers": ["any unresolved issues"],
-     "context_hints": ["important context to preserve"]
-   }
-   ```
+- **Current Task**: What is being actively worked on
+- **Key Decisions**: Important decisions made this session (2-3 bullet points)
+- **Active Files**: Top 5 most relevant files from metrics
+- **Context Hints**: Critical context needed for restoration
 
-3. **Confirm Checkpoint Created**
-   Report:
-   - Checkpoint name and location
-   - Summary of what was captured
-   - Command to restore: `/session-restore <name>`
+### 3. Save Checkpoint
 
-## Usage Examples
+Write the checkpoint file:
+
+```bash
+mkdir -p "${CLAUDE_PLUGIN_ROOT}/data/checkpoints"
+```
+
+Then use Write tool to create `${CLAUDE_PLUGIN_ROOT}/data/checkpoints/$ARGUMENTS.json` with:
+
+```json
+{
+  "name": "<checkpoint-name>",
+  "timestamp": "<current ISO timestamp>",
+  "auto_captured": true,
+  "summary": "<2-3 sentence summary of session state>",
+  "current_task": "<what is being worked on>",
+  "decisions": ["decision 1", "decision 2"],
+  "active_files": ["file1.py", "file2.md"],
+  "context_hints": ["important context 1", "important context 2"],
+  "metrics_snapshot": {
+    "duration_minutes": <from metrics>,
+    "health_score": <from metrics>,
+    "files_read_count": <count>,
+    "tool_calls": <count>
+  }
+}
+```
+
+### 4. Update Metrics Counter
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/metrics-tracker.py checkpoint
+```
+
+### 5. Confirm
+
+Report to user:
+- Checkpoint saved: `$ARGUMENTS`
+- To restore: `/session-restore $ARGUMENTS`
+
+## Examples
 
 - `/session-checkpoint before-refactor` - Save before major changes
+- `/session-checkpoint milestone-1` - Save at completion point
 - `/session-checkpoint end-of-day` - Save before ending work
-- `/session-checkpoint feature-complete` - Save at milestone
-
-## Notes
-
-Checkpoints capture semantic meaning, not raw context. They're designed to help you (and Claude) quickly restore mental state after a session restart.

@@ -1,84 +1,67 @@
 ---
 name: session-optimize
 description: Analyze session context and provide optimization recommendations
-allowed-tools: Read, Bash
+allowed-tools: Bash, Read
 ---
 
 # Session Optimization Analysis
 
-Analyze the current session to identify what context can be pruned vs. what must be preserved.
+Analyze the current session metrics and provide specific optimization recommendations.
 
-## Steps
+## Execute
 
-1. **Analyze Context Composition**
-   Review what types of content are consuming context:
-   - File reads (which files, how large, still relevant?)
-   - Tool outputs (resolved errors, old build outputs?)
-   - Exploration paths (dead ends, superseded approaches?)
-   - Conversation history (key decisions vs. routine exchanges?)
+### 1. Get Analysis
 
-2. **Identify Safe-to-Prune Content**
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/metrics-tracker.py analyze
+```
 
-   **High Confidence Prune:**
-   - Old tool outputs no longer relevant (e.g., old `git status` results)
-   - File contents that were read then edited (superseded by newer versions)
-   - Exploratory code paths that were explicitly abandoned
-   - Verbose error messages that have been resolved
-   - Repeated similar queries/responses
+Display the output exactly as shown. The analysis includes:
+- Health score with penalty breakdown
+- Files accessed (for pruning consideration)
+- Tool usage patterns
+- Specific recommendations
 
-   **Medium Confidence Prune:**
-   - Files read for reference but not actively being modified
-   - Background context gathered early in session
-   - Detailed implementation discussions for completed features
+### 2. Enhance Recommendations
 
-3. **Identify Must-Preserve Content**
+Based on the metrics output, provide additional context-aware recommendations:
 
-   **Critical - Never Prune:**
-   - Current active task and immediate goals
-   - Recent architectural/design decisions and their rationale
-   - Active file states (files being edited now)
-   - User preferences established this session
-   - Unresolved errors or blockers
-   - Pending TODOs and action items
+**If health score < 40 (Critical):**
+- Strongly recommend immediate checkpoint: `/session-checkpoint before-optimize`
+- Suggest aggressive compaction with focus on current task only
 
-   **Important - Preserve Summary:**
-   - Overall project context
-   - Key patterns/conventions established
-   - Major milestones reached
+**If health score 40-60 (Warning):**
+- Recommend checkpoint before optimization
+- Suggest targeted compaction preserving key decisions
 
-4. **Generate Optimization Recommendations**
+**If health score 60-80 (Moderate):**
+- Optimization is optional
+- Light compaction may help responsiveness
 
-   ```
-   SESSION OPTIMIZATION ANALYSIS
-   =============================
+**If health score > 80 (Healthy):**
+- No optimization needed
+- Session is running efficiently
 
-   SAFE TO PRUNE:
-   - [specific content type]: [reason it's safe]
-   - [specific content type]: [reason it's safe]
+### 3. Generate Compact Command
 
-   MUST PRESERVE:
-   - [specific content]: [why it's critical]
-   - [specific content]: [why it's critical]
+Based on the analysis, construct a specific `/compact` command:
 
-   ESTIMATED IMPACT:
-   Context reduction: ~[X]%
+```
+/compact Focus on: [current active task]. Preserve: [2-3 key items from metrics].
+Prune: old file reads, resolved errors, superseded tool outputs.
+```
 
-   RECOMMENDED ACTION:
-   Run: /compact [focus phrase based on must-preserve items]
+### 4. Offer Actions
 
-   Or create checkpoint first: /session-checkpoint before-optimize
-   ```
+Present these options to the user:
 
-5. **Provide Compact Command**
-   Generate a specific `/compact` invocation with a focus phrase that emphasizes preserving critical context.
+1. **Safe approach**: `/session-checkpoint pre-optimize` then `/compact`
+2. **Quick approach**: `/compact` with the generated focus phrase
+3. **Manual review**: Show me the specific files/content to consider pruning
 
-## Usage
+## When to Use
 
-Run this command when:
-- Session feels slow or responses are degrading
-- You've been working for 3+ hours continuously
-- Before a major context switch (new feature, different area of code)
-
-## Notes
-
-This analysis helps you make informed decisions about what to preserve during compaction. Always create a checkpoint before aggressive optimization.
+- Session health score drops below 60
+- Responses feel slower or less coherent
+- Working for 3+ hours continuously
+- Before switching to a different area of the codebase
