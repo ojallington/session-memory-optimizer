@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "session-memory-optimizer",
-      "source": "."
+      "source": "./"
     }
   ]
 }
